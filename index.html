@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>아이디어 조립실 · Idea Assembly</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&family=Archivo:wght@500;600;700&display=swap">
+  <style>
+    :root{
+      --paper:#F3F3F1; --card:#FFFFFF; --ink:#111112; --ink-soft:#6A6A68;
+      --line:#D8D8D4; --line-2:#EAEAE7;
+      --accent:#1447E6; --accent-soft:rgba(20,71,230,0.08); --on-accent:#F3F3F1;
+      --mark:#F2C200; --on-mark:#111112;
+      --shadow:rgba(17,17,18,0.10);
+    }
+    @media (prefers-color-scheme: dark){
+      :root:not([data-theme="light"]){
+        --paper:#0C0D0F; --card:#16181B; --ink:#ECECEA; --ink-soft:#91928F;
+        --line:#2A2D31; --line-2:#1E2124;
+        --accent:#7C9BFF; --accent-soft:rgba(124,155,255,0.12); --on-accent:#0C0D0F;
+        --mark:#FFD233; --on-mark:#0C0D0F;
+        --shadow:rgba(0,0,0,0.55);
+      }
+    }
+    :root[data-theme="dark"]{
+      --paper:#0C0D0F; --card:#16181B; --ink:#ECECEA; --ink-soft:#91928F;
+      --line:#2A2D31; --line-2:#1E2124;
+      --accent:#7C9BFF; --accent-soft:rgba(124,155,255,0.12); --on-accent:#0C0D0F;
+      --mark:#FFD233; --on-mark:#0C0D0F;
+      --shadow:rgba(0,0,0,0.55);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; min-height:100vh; background:var(--paper); color:var(--ink);
+      font-family:"Gothic A1", system-ui, -apple-system, sans-serif;
+      font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+    }
+    ::selection{ background:var(--mark); color:var(--on-mark); }
+    .wrap{ max-width:680px; margin:0 auto; padding:1.8rem 1.15rem 4rem; }
+
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.1rem; }
+    .brand{ font-family:"Archivo",sans-serif; font-weight:700; font-size:.68rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-soft); }
+    .brand b{ color:var(--ink); }
+
+    .screen{ animation:in .26s cubic-bezier(.2,.7,.3,1) both; }
+    @keyframes in{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:none; } }
+
+    h1{ font-weight:800; font-size:clamp(1.7rem,5.2vw,2.4rem); line-height:1.25; letter-spacing:-.025em; margin:0 0 .7rem; }
+    h2{ font-weight:700; font-size:1.1rem; margin:1.5rem 0 1rem; }
+    .sub{ margin:0 0 1.7rem; color:var(--ink-soft); font-size:.94rem; line-height:1.7; }
+
+    .ta{ width:100%; min-height:118px; resize:vertical; font-family:inherit; font-size:1rem; line-height:1.7;
+      color:var(--ink); background:var(--card); border:2px solid var(--line); border-radius:4px;
+      padding:.95rem; outline:none; transition:border-color .16s; }
+    .ta::placeholder{ color:var(--ink-soft); opacity:.8; }
+    .ta:focus{ border-color:var(--accent); }
+
+    .chips{ display:flex; flex-wrap:wrap; gap:.38rem; margin-bottom:.5rem; }
+    .chip{ font-family:inherit; font-size:.9rem; font-weight:500; color:var(--ink);
+      background:var(--card); border:1.5px solid var(--line); border-radius:3px; padding:.45rem .75rem;
+      cursor:pointer; transition:.14s; }
+    .chip:hover{ border-color:var(--ink-soft); }
+    .chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:var(--on-accent); font-weight:700; }
+
+    .nav{ display:flex; gap:.5rem; margin-top:2rem; padding-top:1.3rem; border-top:1.5px solid var(--line); }
+    .btn{ font-family:inherit; font-weight:700; font-size:.93rem; background:var(--accent); color:var(--on-accent);
+      border:2px solid var(--accent); border-radius:3px; padding:.65rem 1.6rem; cursor:pointer; transition:.14s; }
+    .btn:hover{ filter:brightness(1.08); }
+    .btn:disabled{ opacity:.35; cursor:not-allowed; }
+    .btn.ghost{ background:transparent; color:var(--ink-soft); border-color:var(--line); }
+    .spacer{ flex:1; }
+
+    .how{ background:var(--card); border:1.5px solid var(--line); border-left:5px solid var(--accent);
+      border-radius:4px; padding:.9rem 1rem; margin-bottom:.6rem; }
+    .how-t{ font-weight:800; font-size:1.02rem; margin-bottom:.3rem; }
+    .how-d{ font-size:.92rem; line-height:1.7; color:var(--ink-soft); }
+
+    .analyzed-box{ background:var(--card); border:1.5px solid var(--line); border-radius:4px; padding:1rem; margin-bottom:1.5rem; }
+    .analyzed-box div{ margin-bottom:.5rem; font-size:.95rem; }
+    .analyzed-box b{ font-weight:700; }
+
+    input[type="password"]{ width:100%; padding:.8rem; border:2px solid var(--line); border-radius:4px; margin-bottom:1rem; font-size:1rem; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <span class="brand"><b>아이디어 조립실</b> · Idea Assembly</span>
+  </div>
+
+  <!-- API 키 설정 화면 -->
+  <div class="screen" id="sc-setup">
+    <h1>Claude API 설정</h1>
+    <p class="sub">Anthropic API 키를 입력해줘. 경험 분석과 아이디어 생성에 사용돼.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-..." autofocus>
+    <button class="btn" id="apiKeyBtn">설정 완료</button>
+    <p class="sub" style="margin-top:2rem;color:var(--ink-soft);font-size:.85rem;">
+      🔗 <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);text-decoration:none;">Anthropic Console</a>에서 API 키를 발급받을 수 있어.
+    </p>
+  </div>
+
+  <!-- 시작 화면 -->
+  <div class="screen" id="sc-start" hidden>
+    <h1>뭘 만들지 모르겠을 때,<br>재료부터 꺼내보자.</h1>
+    <p class="sub">경험을 입력하면 Claude AI가 육하원칙으로 분석해주고, 그 재료에 맞는 아이디어 3개를 새로 만들어줘.</p>
+    <div style="display:grid;gap:.5rem;">
+      <button class="btn" id="pathExp">경험에서 시작</button>
+      <button class="btn ghost" id="pathPick">직접 골라보기</button>
+      <button class="btn ghost" id="pathRandom">랜덤으로 뽑기</button>
+    </div>
+  </div>
+
+  <!-- 경험 입력 화면 -->
+  <div class="screen" id="sc-exp" hidden>
+    <h1>어떤 게 불편했어?</h1>
+    <p class="sub">겪은 일을 그대로 적으면 Claude AI가 누가·뭘·왜를 분석해줄게. 30초 정도 걸려.</p>
+    <textarea id="expTa" class="ta" maxlength="200" placeholder="예) 조별과제 할 때 누가 뭘 맡을지 정하는 게 제일 오래 걸렸다"></textarea>
+    <div class="nav">
+      <button class="btn ghost" id="expBack">이전</button>
+      <div class="spacer"></div>
+      <button class="btn" id="expGo">분석</button>
+    </div>
+  </div>
+
+  <!-- 결과 화면 -->
+  <div class="screen" id="sc-result" hidden>
+    <h1>분석 완료</h1>
+    <p class="sub">Claude AI가 인식한 5가지 요소와 새로 생성한 아이디어 3개.</p>
+
+    <h2 style="margin-top:1rem;">인식된 재료</h2>
+    <div class="analyzed-box" id="analyzed"></div>
+
+    <h2>Claude가 제안한 아이디어 3개</h2>
+    <div id="ideas"></div>
+
+    <div class="nav">
+      <button class="btn ghost" id="resBack">처음으로</button>
+      <div class="spacer"></div>
+      <button class="btn" id="resRefresh">다시 생성</button>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="analyzer.js"></script>
+<script src="generator.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var state = {
+    apiKey: null,
+    exp: "",
+    targets: [],
+    actions: [],
+    factors: [],
+    whens: [],
+    wheres: [],
+    ideas: []
+  };
+
+  // === UI 함수 ===
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.hidden = true);
+    document.getElementById(id).hidden = false;
+  }
+
+  function renderAnalyzed() {
+    var html = "";
+    html += "<div><b>대상:</b> " + (state.targets.length > 0 ? state.targets.join(", ") : "미정") + "</div>";
+    html += "<div><b>행동:</b> " + (state.actions.length > 0 ? state.actions.join(", ") : "미정") + "</div>";
+    html += "<div><b>문제:</b> " + (state.factors.length > 0 ? state.factors.join(", ") : "미정") + "</div>";
+    if (state.whens.length > 0) html += "<div><b>시간:</b> " + state.whens.join(", ") + "</div>";
+    if (state.wheres.length > 0) html += "<div><b>장소:</b> " + state.wheres.join(", ") + "</div>";
+    document.getElementById("analyzed").innerHTML = html;
+  }
+
+  function renderIdeas() {
+    var html = "";
+    state.ideas.forEach(function(idea, idx) {
+      html += "<div class='how'>";
+      html += "<div class='how-t'>" + (idx + 1) + ". " + idea.title + "</div>";
+      html += "<div class='how-d'>" + idea.description + "</div>";
+      html += "</div>";
+    });
+    document.getElementById("ideas").innerHTML = html;
+  }
+
+  // === 이벤트 리스너 ===
+
+  // API 키 설정
+  document.getElementById("apiKeyBtn").addEventListener("click", function() {
+    var key = document.getElementById("apiKeyInput").value.trim();
+    if (!key) {
+      alert("API 키를 입력해주세요");
+      return;
+    }
+    state.apiKey = key;
+    localStorage.setItem("apiKey", key);
+    Analyzer.setApiKey(key);
+    Generator.setApiKey(key);
+    showScreen("sc-start");
+  });
+
+  // Enter 키로도 설정
+  document.getElementById("apiKeyInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      document.getElementById("apiKeyBtn").click();
+    }
+  });
+
+  // 시작 화면
+  document.getElementById("pathExp").addEventListener("click", function() {
+    showScreen("sc-exp");
+  });
+
+  document.getElementById("pathPick").addEventListener("click", function() {
+    alert("직접 고르기는 아직 개발 중입니다");
+  });
+
+  document.getElementById("pathRandom").addEventListener("click", function() {
+    alert("랜덤 생성은 아직 개발 중입니다");
+  });
+
+  // 경험 입력 화면
+  document.getElementById("expBack").addEventListener("click", function() {
+    showScreen("sc-start");
+  });
+
+  document.getElementById("expGo").addEventListener("click", async function() {
+    state.exp = document.getElementById("expTa").value.trim();
+    if (!state.exp) {
+      alert("경험을 입력해주세요");
+      return;
+    }
+
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = "분석 중...";
+
+    try {
+      // Claude API로 분석
+      var result = await Analyzer.analyze(state.exp);
+
+      if (!result) {
+        throw new Error("분석 실패");
+      }
+
+      state.targets = result.targets || [];
+      state.actions = result.actions || [];
+      state.factors = result.factors || [];
+      state.whens = result.whens || [];
+      state.wheres = result.wheres || [];
+
+      if (state.factors.length === 0) {
+        throw new Error("문제 요소를 찾을 수 없습니다");
+      }
+
+      // 아이디어 생성
+      btn.textContent = "아이디어 생성 중...";
+      state.ideas = await Generator.generateIdeas(
+        state.targets, state.actions, state.factors, state.whens, state.wheres
+      ) || [];
+
+      if (state.ideas.length === 0) {
+        throw new Error("아이디어 생성 실패");
+      }
+
+      renderAnalyzed();
+      renderIdeas();
+      showScreen("sc-result");
+    } catch (error) {
+      console.error(error);
+      alert("오류: " + error.message + "\nAPI 키를 확인해주세요.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "분석";
+    }
+  });
+
+  // 결과 화면
+  document.getElementById("resBack").addEventListener("click", function() {
+    document.getElementById("expTa").value = "";
+    showScreen("sc-start");
+  });
+
+  document.getElementById("resRefresh").addEventListener("click", async function() {
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = "다시 생성 중...";
+
+    try {
+      state.ideas = await Generator.generateIdeas(
+        state.targets, state.actions, state.factors, state.whens, state.wheres
+      ) || [];
+
+      if (state.ideas.length === 0) {
+        throw new Error("아이디어 생성 실패");
+      }
+
+      renderIdeas();
+    } catch (error) {
+      alert("오류: " + error.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "다시 생성";
+    }
+  });
+
+  // 초기화: API 키 확인
+  var savedKey = localStorage.getItem("apiKey");
+  if (savedKey) {
+    state.apiKey = savedKey;
+    Analyzer.setApiKey(savedKey);
+    Generator.setApiKey(savedKey);
+    showScreen("sc-start");
+  } else {
+    showScreen("sc-setup");
+  }
+})();
+</script>
+</body>
+</html>
